@@ -1,5 +1,7 @@
 var TaskList = artifacts.require("./TaskList.sol");
 
-module.exports = function(deployer) {
+module.exports = async function(deployer) {
   deployer.deploy(TaskList);
+  tasklist = await TaskList.deployed();
+  await tasklist.createTask('A new task', "description");
 };
