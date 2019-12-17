@@ -1,6 +1,7 @@
 pragma solidity ^0.5.11;
 
 import '../node_modules/@openzeppelin/contracts/payment/escrow/Escrow.sol';
+import './PPCToken.sol';
 
 contract TaskList {
 	uint8 public task_count = 0;
@@ -8,6 +9,7 @@ contract TaskList {
 	uint8[] ratings = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 	// enum Difficulty { standard, advanced , expert }
 	// enum Uncertainity { clear, uncertain, unknown }
+	PPCToken private ppctoken = new PPCToken();
 
 	struct Task {
 		uint8 id;
