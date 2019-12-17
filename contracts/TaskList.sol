@@ -9,7 +9,11 @@ contract TaskList {
 	uint8[] ratings = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 	// enum Difficulty { standard, advanced , expert }
 	// enum Uncertainity { clear, uncertain, unknown }
-	PPCToken private ppctoken = new PPCToken();
+	PPCToken private ppctoken;
+
+	constructor (address _ppctoken_address) public {
+		ppctoken = PPCToken(_ppctoken_address);
+	}
 
 	struct Task {
 		uint8 id;
@@ -106,18 +110,6 @@ contract TaskList {
 	function getTaskDeposit(uint8 _task_id) public view returns (uint256) {
 		Task memory _task = tasks[_task_id];
 		return _task.escrow.depositsOf(_task.workers[0]);
-	}
-
-	function acceptTask(uint _id) public {
-
-	}
-
-	function completeTask(uint _id) public {
-
-	}
-
-	function reviewTask(uint _id) public {
-
 	}
 
 	function toggleStarted(uint8 _id) public {

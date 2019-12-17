@@ -1,9 +1,10 @@
 // @ts-nocheck
+const PPCToken = artifacts.require('./PPCToken.sol')
 const TaskList = artifacts.require('./TaskList.sol')
 
 const truffleAssert = require('truffle-assertions');
 
-contract('TaskList', (accounts) => {
+contract('TaskList Tests', (accounts) => {
 
   const validator_0 = accounts[0];
   const validator_1 = accounts[1];
@@ -11,6 +12,7 @@ contract('TaskList', (accounts) => {
   const worker_2 = accounts[3];
 
   before(async () => {
+    this.ppctoken = await PPCToken.deployed()
     this.tasklist = await TaskList.deployed()
   })
 
@@ -84,6 +86,19 @@ contract('TaskList', (accounts) => {
     // check deposited amount
     let deposit = await this.tasklist.getTaskDeposit(0);
     assert.equal(deposit, amount);
+  })
+
+  it('mint PPCToken to given account', async () => {
+    let is_minter = await this.ppctoken.isMinter(accounts[0]);
+    console.log( 'account 0 is minter: ', is_minter);
+    const amount = web3.utils.toWei('10', "ether"); // allowed because PPCToken also uses 18 decimals
+    const balance_before = await this.ppctoken.balanceOf(worker_1);
+    await this.ppctoken.mint(worker_1, amount); 
+
+    // check account balance
+    const balance_after = await this.ppctoken.balanceOf(worker_1);
+    let value = Number(balance_after) - Number(balance_before);
+    assert.equal(value, amount);
   })
 
   /*

@@ -1,24 +1,16 @@
 pragma solidity ^0.5.0;
 
-import "../node_modules/@openzeppelin/contracts/token/ERC777/ERC777.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20Mintable.sol";
+import "../node_modules/@openzeppelin/contracts/token/ERC20/ERC20Detailed.sol";
 import "../node_modules/@openzeppelin/contracts/ownership/Ownable.sol";
 
-contract PPCToken is ERC777, Ownable {
+contract PPCToken is ERC20Mintable, ERC20Detailed {
 
     constructor()
-    ERC777("PPCToken", "PPC", new address[](0)) // there is no defaultOperators -> empty array
+    ERC20Detailed("PPCToken", "PPC", 18) // there is no defaultOperators -> empty array
     public
     {
-        _mint(msg.sender, msg.sender, 0, "", ""); // initial supply is 0
+        _mint(msg.sender, 0); // initial supply is 0
     }
 
-    function mint
-    (
-        address _receiver,
-        uint256 _amount
-    )
-    public onlyOwner
-    {
-        _mint(msg.sender, _receiver, _amount, "", "");
-    }
 }

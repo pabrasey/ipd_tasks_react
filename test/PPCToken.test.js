@@ -4,6 +4,8 @@ const truffleAssert = require('truffle-assertions');
 
 contract('PPCToken', (accounts) => {
 
+  const worker_1 = accounts[2];
+
   before(async () => {
     this.ppctoken = await PPCToken.deployed()
   })
@@ -14,6 +16,20 @@ contract('PPCToken', (accounts) => {
     assert.notEqual(address, '')
     assert.notEqual(address, null)
     assert.notEqual(address, undefined)
+  })
+
+  it('mints token to given address', async () => {
+    //console.log(this.ppctoken)
+    let is_minter = await this.ppctoken.isMinter(accounts[0]);
+    console.log( 'account 0 is minter: ', is_minter);
+    const amount = web3.utils.toWei('10', "ether"); // allowed because PPCToken also uses 18 decimals
+    const balance_before = await this.ppctoken.balanceOf(worker_1);
+    await this.ppctoken.mint(worker_1, amount); 
+
+    // check account balance
+    const balance_after = await this.ppctoken.balanceOf(worker_1);
+    let value = Number(balance_after) - Number(balance_before);
+    assert.equal(value, amount);
   })
 
 })
