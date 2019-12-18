@@ -70,6 +70,11 @@ contract TaskList {
 		uint256 amount
 	);
 
+	event PPCTokenMinted(
+		address account,
+		uint amount
+	);
+
 	function createTask(string memory _title, string memory _description) public {
 		uint8 _id = task_count;
 		Task memory task = Task(_id, _title, _description, State.created, 0, 0, new address[](0), new address[](0), new Escrow());
@@ -110,6 +115,14 @@ contract TaskList {
 	function getTaskDeposit(uint8 _task_id) public view returns (uint256) {
 		Task memory _task = tasks[_task_id];
 		return _task.escrow.depositsOf(_task.workers[0]);
+	}
+
+	function mintPPCTOken(address _account, uint8 _ppc) public {
+		if(_ppc >= 100) {
+			ppctoken.mint(_account, 10 ** 18);
+			emit PPCTokenMinted(_account, 10 ** 18);
+		}
+		emit PPCTokenMinted(_account, 0);
 	}
 
 	function toggleStarted(uint8 _id) public {

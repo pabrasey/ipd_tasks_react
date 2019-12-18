@@ -32,8 +32,6 @@ contract('TaskList Tests', (accounts) => {
     assert.equal(task_count.toNumber(), 1);
 
     let validators = await this.tasklist.getValidators(0);
-    //let validators = await task.validators;
-    console.log(validators);
     assert.equal(validators[0], accounts[0]);
 
     // check the event
@@ -88,17 +86,24 @@ contract('TaskList Tests', (accounts) => {
     assert.equal(deposit, amount);
   })
 
-  it('mint PPCToken to given account', async () => {
-    let is_minter = await this.ppctoken.isMinter(accounts[0]);
-    console.log( 'account 0 is minter: ', is_minter);
-    const amount = web3.utils.toWei('10', "ether"); // allowed because PPCToken also uses 18 decimals
-    const balance_before = await this.ppctoken.balanceOf(worker_1);
-    await this.ppctoken.mint(worker_1, amount); 
+  it('mints PPCToken to given account according to PPC', async () => {
+    let is_minter = await this.ppctoken.isMinter(this.tasklist.address);
+    assert.isTrue(is_minter);
+
+    // PPC greater or equal to threshold
+    const balance_before = await this.ppctoken.balanceOf(worker_2);
+    await this.tasklist.mintPPCTOken(worker_2, 100);
 
     // check account balance
-    const balance_after = await this.ppctoken.balanceOf(worker_1);
+    const balance_after = await this.ppctoken.balanceOf(worker_2);
     let value = Number(balance_after) - Number(balance_before);
-    assert.equal(value, amount);
+    assert.equal(value, 10 ** 18);
+
+    // PPC less than threshold
+    let result = await this.tasklist.mintPPCTOken(worker_2, 90);
+    const event = result.logs[0].args;
+    assert.equal(event.account, worker_2);
+    assert.equal(event.amount.toNumber(), 0);
   })
 
   /*

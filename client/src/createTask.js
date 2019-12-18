@@ -35,7 +35,7 @@ class CreateTask extends Component {
 
     return (
       <Box boxShadow={3} m={50} p={20}>
-        <h4>Create new task</h4>
+        <h3>Create new task</h3>
         <Form onSubmit={this.handleSubmit}>
           <Field label="Title:">
             <Input
