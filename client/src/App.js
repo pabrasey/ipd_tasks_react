@@ -1,14 +1,16 @@
 import React, { Component } from "react";
 import TaskListContract from "./contracts/TaskList.json";
+import PPCTokenContract from "./contracts/PPCToken.json";
 import getWeb3 from "./getWeb3";
 import TaskTable from "./taskTable";
 import UpdateTask from "./updateTask";
 import CreateTask from "./createTask";
+import BalanceTable from "./balanceTable"
 
 import "./App.css";
 
 class App extends Component {
-  state = { web3: null, accounts: null, contract: null, task_count: 0, tasks: [] };
+  state = { web3: null, accounts: null, contract: null, task_count: 0, tasks: [], ppc_balances: [] };
 
   componentDidMount = async () => {
     try {
@@ -17,21 +19,27 @@ class App extends Component {
 
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
+      const networkId = await web3.eth.net.getId();
       console.log('accounts: ', accounts);
 
-      // Get the contract instance.
-      const networkId = await web3.eth.net.getId();
-      const deployedNetwork = TaskListContract.networks[networkId];
-      const instance = new web3.eth.Contract(
+      // Get the TaskList instance.
+      const TaskListdeployedNetwork = TaskListContract.networks[networkId];
+      const tasklist = new web3.eth.Contract(
         TaskListContract.abi,
-        deployedNetwork && deployedNetwork.address,
+        TaskListdeployedNetwork && TaskListdeployedNetwork.address,
       );
 
-        console.log('instance:', instance);
+      // Get the PPCToken instance.
+      const PPCTokendeployedNetwork = PPCTokenContract.networks[networkId];
+      const ppctoken = new web3.eth.Contract(
+        PPCTokenContract.abi,
+        PPCTokendeployedNetwork && PPCTokendeployedNetwork.address,
+      );
 
+      console.log('ppctoken instance: ', ppctoken);
       // Set web3, accounts, and contract to the state, and then proceed with an
       // example of interacting with the contract's methods.
-      this.setState({ web3, accounts, contract: instance }, this.getContractData);
+      this.setState({ web3, accounts, tasklist, ppctoken }, this.getContractData);
 
     } catch (error) {
       // Catch any errors for any of the above operations.
@@ -45,21 +53,32 @@ class App extends Component {
 
   getContractData = async () => {
 
-    const { accounts, contract } = this.state;
+    const { accounts, tasklist } = this.state;
 
-    const task_count = await contract.methods.task_count().call();
+    // TaskList
+
+    const task_count = await tasklist.methods.task_count().call();
     const tasks = [];
 
-    for (var i = 1; i <= task_count; i++) {
-      const task = await contract.methods.tasks(i).call();
-      const validators = await contract.methods.getValidators(i).call();
+    for (var i = 0; i < task_count; i++) {
+      const task = await tasklist.methods.tasks(i).call();
+      const validators = await tasklist.methods.getValidators(i).call();
       task.validators = validators;
       tasks.push(task);
     }
 
     console.log('tasks: ', tasks);
 
-    this.setState({ task_count, tasks });
+    // PPCToken
+    let ppc_balances = [];
+    for(var i = 0; i < accounts.length; i++){
+      let balance = await this.state.ppctoken.methods.balanceOf(accounts[i]).call();
+      let el = {account: accounts[i], balance: balance};
+      ppc_balances.push(el);
+    };
+    console.log('ppc_balances: ', ppc_balances);
+
+    this.setState({ task_count, tasks, ppc_balances });
 
   }
 
@@ -77,8 +96,9 @@ class App extends Component {
           <p>The number of tasks is: { this.state.task_count }</p>
         </div>
         <TaskTable tasks = { tasks } />
-        <UpdateTask web3 = {this.state.web3} contract = {this.state.contract} tasks = { tasks } />
-        <CreateTask web3 = {this.state.web3} contract = {this.state.contract} />
+        <UpdateTask web3 = {this.state.web3} contract = {this.state.tasklist} tasks = { tasks } />
+        <CreateTask web3 = {this.state.web3} contract = {this.state.tasklist} />
+        <BalanceTable balances = { this.state.ppc_balances } />
       </div>
     );
   }

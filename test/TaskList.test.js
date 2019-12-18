@@ -27,6 +27,7 @@ contract('TaskList Tests', (accounts) => {
   it('creates tasks', async () => {
     const result = await this.tasklist.createTask('A new task', "description");
     const task = await this.tasklist.tasks(0);
+    assert.equal(task.title, 'A new task');
 
     const task_count = await this.tasklist.task_count();
     assert.equal(task_count.toNumber(), 1);

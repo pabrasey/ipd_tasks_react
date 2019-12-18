@@ -35,11 +35,11 @@ class TaskTable extends Component {
     const rows = [];
     const tasks = this.props.tasks;
 
+    console.log('tasks: ', tasks);
+
     tasks.forEach((task) => {
       rows.push( <TaskRow task = { task } key = { task.id } /> );
     });
-
-    console.log('rows: ', rows);
 
     return (
       <Table m={50} width={0.9}>
