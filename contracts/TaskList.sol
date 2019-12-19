@@ -119,8 +119,8 @@ contract TaskList {
 
 	function mintPPCTOken(address _account, uint8 _ppc) public {
 		if(_ppc >= 100) {
-			ppctoken.mint(_account, 10 ** 18);
-			emit PPCTokenMinted(_account, 10 ** 18);
+			ppctoken.mint(_account, 1);
+			emit PPCTokenMinted(_account, 1);
 		}
 		emit PPCTokenMinted(_account, 0);
 	}

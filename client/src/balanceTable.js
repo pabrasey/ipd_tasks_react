@@ -20,6 +20,8 @@ class BalanceTable extends Component {
 
       const rows = [];
 
+      // balances.sort((a, b) => (a.balance < b.balance) ? 1 : -1);
+
       balances.forEach((_balance, index) => {
         rows.push( <BalanceRow balance = { _balance } key = { index } /> );
       });

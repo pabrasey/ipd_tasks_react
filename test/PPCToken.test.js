@@ -23,7 +23,7 @@ contract('PPCToken', (accounts) => {
     let is_minter = await this.ppctoken.isMinter(accounts[0]);
     assert.isTrue(is_minter);
     
-    const amount = web3.utils.toWei('10', "ether"); // allowed because PPCToken also uses 18 decimals
+    const amount = 1;
     const balance_before = await this.ppctoken.balanceOf(worker_1);
     await this.ppctoken.mint(worker_1, amount); 
 

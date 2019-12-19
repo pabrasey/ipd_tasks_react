@@ -98,7 +98,7 @@ contract('TaskList Tests', (accounts) => {
     // check account balance
     const balance_after = await this.ppctoken.balanceOf(worker_2);
     let value = Number(balance_after) - Number(balance_before);
-    assert.equal(value, 10 ** 18);
+    assert.equal(value, 1);
 
     // PPC less than threshold
     let result = await this.tasklist.mintPPCTOken(worker_2, 90);

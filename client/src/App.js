@@ -19,6 +19,8 @@ class App extends Component {
 
       // Use web3 to get the user's accounts.
       const accounts = await web3.eth.getAccounts();
+      accounts.push("0x299818F98284FC7dbE0721827A5678FD091B91A2", "0x1AEf5FCA1cd59978214b70bd734334F3f93F88be", 
+      "0xebd7F835f3E3c80ab1F2F3F05dd40398EeA4d1F7");
       const networkId = await web3.eth.net.getId();
       console.log('accounts: ', accounts);
 
@@ -70,6 +72,9 @@ class App extends Component {
     console.log('tasks: ', tasks);
 
     // PPCToken
+
+    //this.state.ppctoken.methods.mint(accounts[3],(1).toString()).send({ from: accounts[0] })
+
     let ppc_balances = [];
     for(var i = 0; i < accounts.length; i++){
       let balance = await this.state.ppctoken.methods.balanceOf(accounts[i]).call();
