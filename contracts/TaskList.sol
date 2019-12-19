@@ -1,6 +1,7 @@
 pragma solidity ^0.5.11;
 
 import '../node_modules/@openzeppelin/contracts/payment/escrow/Escrow.sol';
+import './PPCToken.sol';
 
 contract TaskList {
 	uint8 public task_count = 0;
@@ -8,6 +9,11 @@ contract TaskList {
 	uint8[] ratings = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 	// enum Difficulty { standard, advanced , expert }
 	// enum Uncertainity { clear, uncertain, unknown }
+	PPCToken private ppctoken;
+
+	constructor (address _ppctoken_address) public {
+		ppctoken = PPCToken(_ppctoken_address);
+	}
 
 	struct Task {
 		uint8 id;
@@ -64,6 +70,11 @@ contract TaskList {
 		uint256 amount
 	);
 
+	event PPCTokenMinted(
+		address account,
+		uint amount
+	);
+
 	function createTask(string memory _title, string memory _description) public {
 		uint8 _id = task_count;
 		Task memory task = Task(_id, _title, _description, State.created, 0, 0, new address[](0), new address[](0), new Escrow());
@@ -106,16 +117,12 @@ contract TaskList {
 		return _task.escrow.depositsOf(_task.workers[0]);
 	}
 
-	function acceptTask(uint _id) public {
-
-	}
-
-	function completeTask(uint _id) public {
-
-	}
-
-	function reviewTask(uint _id) public {
-
+	function mintPPCTOken(address _account, uint8 _ppc) public {
+		if(_ppc >= 100) {
+			ppctoken.mint(_account, 1);
+			emit PPCTokenMinted(_account, 1);
+		}
+		emit PPCTokenMinted(_account, 0);
 	}
 
 	function toggleStarted(uint8 _id) public {

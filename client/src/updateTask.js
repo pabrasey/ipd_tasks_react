@@ -42,7 +42,7 @@ class UpdateTask extends Component {
 
     return (
       <Box boxShadow={3} m={50} p={20}>
-        <h4>Update task</h4>
+        <h3>Update task</h3>
         <Form onSubmit={this.handleSubmit}>
           <Field label="Select task (title):">
             <Select 

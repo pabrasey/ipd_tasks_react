@@ -1,9 +1,10 @@
 // @ts-nocheck
+const PPCToken = artifacts.require('./PPCToken.sol')
 const TaskList = artifacts.require('./TaskList.sol')
 
 const truffleAssert = require('truffle-assertions');
 
-contract('TaskList', (accounts) => {
+contract('TaskList Tests', (accounts) => {
 
   const validator_0 = accounts[0];
   const validator_1 = accounts[1];
@@ -11,6 +12,7 @@ contract('TaskList', (accounts) => {
   const worker_2 = accounts[3];
 
   before(async () => {
+    this.ppctoken = await PPCToken.deployed()
     this.tasklist = await TaskList.deployed()
   })
 
@@ -25,13 +27,12 @@ contract('TaskList', (accounts) => {
   it('creates tasks', async () => {
     const result = await this.tasklist.createTask('A new task', "description");
     const task = await this.tasklist.tasks(0);
+    assert.equal(task.title, 'A new task');
 
     const task_count = await this.tasklist.task_count();
     assert.equal(task_count.toNumber(), 1);
 
     let validators = await this.tasklist.getValidators(0);
-    //let validators = await task.validators;
-    console.log(validators);
     assert.equal(validators[0], accounts[0]);
 
     // check the event
@@ -84,6 +85,26 @@ contract('TaskList', (accounts) => {
     // check deposited amount
     let deposit = await this.tasklist.getTaskDeposit(0);
     assert.equal(deposit, amount);
+  })
+
+  it('mints PPCToken to given account according to PPC', async () => {
+    let is_minter = await this.ppctoken.isMinter(this.tasklist.address);
+    assert.isTrue(is_minter);
+
+    // PPC greater or equal to threshold
+    const balance_before = await this.ppctoken.balanceOf(worker_2);
+    await this.tasklist.mintPPCTOken(worker_2, 100);
+
+    // check account balance
+    const balance_after = await this.ppctoken.balanceOf(worker_2);
+    let value = Number(balance_after) - Number(balance_before);
+    assert.equal(value, 1);
+
+    // PPC less than threshold
+    let result = await this.tasklist.mintPPCTOken(worker_2, 90);
+    const event = result.logs[0].args;
+    assert.equal(event.account, worker_2);
+    assert.equal(event.amount.toNumber(), 0);
   })
 
   /*
