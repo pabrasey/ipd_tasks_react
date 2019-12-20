@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+import IpdApp from './ipdApp';
 import * as serviceWorker from './serviceWorker';
 import { Drizzle, generateStore } from "drizzle";
 import { DrizzleContext } from "../node_modules/drizzle-react";
@@ -14,9 +14,7 @@ console.log('version: ', React.version);
 
 ReactDOM.render(
 
-    <DrizzleContext.Provider drizzle={drizzle}>
-        <App />
-    </DrizzleContext.Provider>, 
+        <IpdApp drizzle={drizzle} />,
 
     document.getElementById('root')
     
