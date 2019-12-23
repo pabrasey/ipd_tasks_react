@@ -4,7 +4,7 @@ import { Table, EthAddress, Form, Field, Select, Input, Button, Box } from 'rimb
 
 class UpdateTask extends Component {
 
-  state = { contract: this.props.contract, new_validator: '', task_id: ''};
+  state = { contract: this.props.contract, new_validator: '', new_worker: '', task_id: ''};
 
   constructor(props) {
     super(props);
@@ -27,7 +27,13 @@ class UpdateTask extends Component {
     event.preventDefault();
     const { contract } = this.state;
     const accounts = await this.props.web3.eth.getAccounts();
-    await contract.methods.addValidator(this.state.task_id, this.state.new_validator).send({ from: accounts[0] });
+
+    if(this.state.new_validator.length == 42){
+      await contract.methods.addValidator(this.state.task_id, this.state.new_validator).send({ from: accounts[0] });
+    }
+    if(this.state.new_worker.length == 42){
+      await contract.methods.addWorker(this.state.task_id, this.state.new_worker).send({ from: accounts[0] });
+    }
     window.location.reload(false); 
   }
 
@@ -55,13 +61,21 @@ class UpdateTask extends Component {
             </Select>
           </Field>
           <br />
-          <Field label="Add validator (address):">
+          <Field label="Add validator (address):" mr={5}>
             <Input
               name="new_validator"
               type="text"
               value={this.state.new_validator}
               onChange={this.handleChange} 
-              required={true}
+              placeholder="e.g. 0xAc03BB73b6a9e108530AFf4Df5077c2B3D481e5A"
+            />
+          </Field>
+          <Field label="Add Worker (address):" >
+            <Input
+              name="new_worker"
+              type="text"
+              value={this.state.new_worker}
+              onChange={this.handleChange} 
               placeholder="e.g. 0xAc03BB73b6a9e108530AFf4Df5077c2B3D481e5A"
             />
           </Field>

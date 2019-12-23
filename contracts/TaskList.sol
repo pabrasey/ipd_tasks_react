@@ -86,10 +86,6 @@ contract TaskList {
 		emit TaskCreated(_id, _title, State.created, tasks[_id].validators);
 	}
 
-	function getValidators(uint8 _id) public view returns (address[] memory) {
-		return tasks[_id].validators;
-	}
-
 	function addValidator(uint8 _task_id, address _validator) public validatorsOnly(_task_id) {
 		Task storage _task = tasks[_task_id];
 		_task.validators.push(_validator);
@@ -97,10 +93,20 @@ contract TaskList {
 		emit validatorAdded(_task_id, _validator);
 	}
 
+	function getValidators(uint8 _id) public view returns (address[] memory) {
+		return tasks[_id].validators;
+	}
+
 	function addWorker(uint8 _task_id, address _worker) public validatorsOnly(_task_id) {
-		Task storage _task = tasks[_task_id];
-		_task.workers.push(_worker);
-		emit workerAdded(_task_id, _worker);
+		if( ! tasks[_task_id].validators_map[_worker] ){
+			Task storage _task = tasks[_task_id];
+			_task.workers.push(_worker);
+			emit workerAdded(_task_id, _worker);
+		}
+	}
+
+	function getWorkers(uint8 _id) public view returns (address[] memory) {
+		return tasks[_id].workers;
 	}
 
 	function fundTaskEscrow(uint8 _task_id) public payable {

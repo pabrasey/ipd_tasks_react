@@ -70,6 +70,9 @@ contract('TaskList Tests', (accounts) => {
       this.tasklist.addWorker(0, worker_2, {from: worker_1}), 
       "caller is not a validator of this task"
     );
+
+    // validator tries to add a validator as worker, which is not permited
+    // TODO
   })
 
   it('funds task', async () => {

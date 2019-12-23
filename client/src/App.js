@@ -65,7 +65,9 @@ class App extends Component {
     for (var i = 0; i < task_count; i++) {
       const task = await tasklist.methods.tasks(i).call();
       const validators = await tasklist.methods.getValidators(i).call();
+      const workers = await tasklist.methods.getWorkers(i).call();
       task.validators = validators;
+      task.workers = workers;
       tasks.push(task);
     }
 

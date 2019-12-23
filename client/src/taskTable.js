@@ -23,6 +23,7 @@ class TaskRow extends React.Component {
         <td>{ task.id }</td>
         <td>{ task.title }</td>
         <td><AddressList addresses = { task.validators } /></td>
+        <td><AddressList addresses = { task.workers } /></td>
       </tr>
     );
   }
@@ -48,6 +49,7 @@ class TaskTable extends Component {
             <th>ID</th>
             <th>Title</th>
             <th>Validators</th>
+            <th>Workers</th>
           </tr>
         </thead>
         <tbody>{rows}</tbody>
