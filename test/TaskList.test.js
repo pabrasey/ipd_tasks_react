@@ -41,22 +41,26 @@ contract('TaskList Tests', (accounts) => {
     assert.equal(event.title, 'A new task')
     assert.equal(event.state.toNumber(), 0)
     assert.equal(event.validators[0], accounts[0])
-  })
+  });
 
   it('adds validator from the allowed accounts', async () => {
     // validator adds new validator
     let result_1 = await this.tasklist.addValidator(0, validator_1, {from: validator_0});
-    //truffleAssert.eventEmitted(result, 'validatorAdded', { task_id: 0, validator: validator_1 });
+
     truffleAssert.eventEmitted(result_1, 'validatorAdded', (ev) => {
       return ev.task_id == 0 && ev.validator == validator_1;
     });
 
-    // worker tries to add a validator, which is not permited
+    let validators = await this.tasklist.getValidators(0);
+    assert.equal(validators[1], validator_1);
+  });
+
+  it('worker tries to add a validator, which is not permitted', async () => {
     truffleAssert.reverts(
       this.tasklist.addValidator(0, worker_2, {from: worker_1}), 
-      "caller is not a validator of this task"
+      "Caller is not a validator of this task"
     );
-  })
+  });
 
   it('adds worker from the allowed accounts', async () => {
     // validator adds new worker
@@ -64,16 +68,38 @@ contract('TaskList Tests', (accounts) => {
     truffleAssert.eventEmitted(result_1, 'workerAdded', (ev) => {
       return ev.task_id == 0 && ev.worker == worker_1;
     });
+    let workers = await this.tasklist.getWorkers(0);
+    assert.equal(workers[0], workers[0]);
+  });
 
-    // worker tries to add a validator, which is not permited
+  it('worker tries to add a worker, which is not permitted', async () => {
     truffleAssert.reverts(
       this.tasklist.addWorker(0, worker_2, {from: worker_1}), 
-      "caller is not a validator of this task"
+      "Caller is not a validator of this task"
     );
+  });
 
-    // validator tries to add a validator as worker, which is not permited
-    // TODO
-  })
+  it('adds a validator as worker, which is not permitted', async () => {
+    truffleAssert.reverts(
+      this.tasklist.addWorker(0, validator_0, {from: validator_0}),
+      "Validator cannot be worker"
+    );
+  });
+
+  it('adds worked hours', async () => {
+    let result = await this.tasklist.addWorkedHours(0, 2, {from: worker_1});
+    truffleAssert.eventEmitted(
+      result, 'workedHoursAdded', (ev) => {
+      return ev.task_id == 0 && ev.worker == worker_1 && ev._hours == 2
+    });
+  });
+
+  it('non-worker tries to add worked hours, which is not permitted', async () => {
+    truffleAssert.reverts(
+      this.tasklist.addWorkedHours(0, 2, {from: validator_0}),
+      "Caller is not a worker of this task"
+    )
+  });
 
   it('funds task', async () => {
     const amount = web3.utils.toWei('10', "ether");
@@ -88,7 +114,7 @@ contract('TaskList Tests', (accounts) => {
     // check deposited amount
     let deposit = await this.tasklist.getTaskDeposit(0);
     assert.equal(deposit, amount);
-  })
+  });
 
   it('mints PPCToken to given account according to PPC', async () => {
     let is_minter = await this.ppctoken.isMinter(this.tasklist.address);
@@ -108,7 +134,7 @@ contract('TaskList Tests', (accounts) => {
     const event = result.logs[0].args;
     assert.equal(event.account, worker_2);
     assert.equal(event.amount.toNumber(), 0);
-  })
+  });
 
   /*
   it('toggles task started', async () => {
